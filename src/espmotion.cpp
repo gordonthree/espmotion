@@ -1,13 +1,14 @@
 #include <ESP8266WiFi.h>
 #include <ArduinoOTA.h>
+#include <ESP8266mDNS.h>
 #include <PubSubClient.h>
 
 const char* ssid = "Tell my WiFi I love her";
 const char* password = "2317239216";
 const char* mqtt_server = "192.168.2.30";
-const char* mqttMotion = "home/motion1/motion";
-const char* mqttPub = "home/motion1/msg";
-const char* mqttSub = "home/motion1/cmd";
+const char* mqttMotion = "home/motion2/motion";
+const char* mqttPub = "home/motion2/msg";
+const char* mqttSub = "home/motion2/cmd";
 const char* clientid = "motion2";
 
 ADC_MODE(ADC_VCC);
@@ -19,7 +20,7 @@ IPAddress myDns(192,168,2,1);
 IPAddress myGate(192,168,2,1);
 
 long lastMsg = 0;
-long conCnt = 0;
+uint16_t conCnt = 0;
 char msg[50];
 int value = 0;
 const uint8_t ledPin = LED_BUILTIN;
@@ -56,6 +57,7 @@ void wifiSetup() {
   WiFi.hostname(hostname);
 
   while (WiFi.waitForConnectResult() != WL_CONNECTED) { // blocking call that waits for wifi connection. if connection unsuccessful, reboot esp
+    delay(2000);
     ESP.restart();
     delay(2000);
   }
@@ -100,8 +102,6 @@ void loop() {
   ArduinoOTA.handle();
   client.loop();
 
-  conCnt++;
-
   if (conCnt>300) {
     conCnt=0;
     client.publish(mqttPub, "offline");
@@ -110,5 +110,6 @@ void loop() {
     delay(5000);
   }
 
+  conCnt++;
   delay(100);
 }
