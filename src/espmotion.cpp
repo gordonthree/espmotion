@@ -25,8 +25,7 @@ char msg[50];
 int value = 0;
 const uint8_t ledPin = LED_BUILTIN;
 const uint8_t motionPin = 5;
-const uint8_t beeper = 14;
-bool motion=false;
+const uint8_t noReset = 16;
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -65,10 +64,8 @@ void wifiSetup() {
 
 void setup() {
   pinMode(ledPin, OUTPUT);
-  pinMode(beeper, OUTPUT);
-  pinMode(motionPin, INPUT);
-  digitalWrite(beeper, 0);
-
+  pinMode(noReset, OUTPUT); // prevent reset
+  digitalWrite(noReset, 0); // pin should go high-z once esp goes to sleep
   wifiSetup();
 
   // Port defaults to 8266
